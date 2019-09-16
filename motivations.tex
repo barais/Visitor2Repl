@@ -1,0 +1,137 @@
+\section{Background and Motivation}
+\label{motiv}
+
+The main objective of our approach is to automatically generate an interactive computer programming environment from a DSL specification initially designed to drive the development of a comprehensive DSL environment with an advanced editor, a regular interpreter, etc. Such a specification usually involves a syntax definition, e.g., in the form of a BNF-like description, and a definition of the semantics, e.g., an operational semantics in the form of an interpreter (or any variant such as a visitor pattern). A language definition also includes static semantics, which define all the context conditions that ensure statically correct conforming programs. In such a definition, the language usually encompasses a single execution entry point, a finely tuned execution context and an interpreter which defines a particular traversal of a given syntax tree to manipulate and update the execution context over the execution. 
+
+Such a language definition is now well supported by advanced language workbenches that help language engineers to develop language tools such as structured editors, debuggers and simulators. For instance, tools like Xtext\footnote{cf. \url{https://www.eclipse.org/Xtext/}} support the generation of an advanced editor with a parser, syntactic validation, and all the features of modern code editors (\emph{e.g.,} syntax coloring, auto completion, etc.). The GEMOC Studio\footnote{cf. \url{http://gemoc.org/studio.html}} helps to complement the language tooling with advanced execution engines and debugging facilities. Other language workbenches (\emph{e.g.,} MPS, Rascal, Spoofax) offer similar facilities \cite{DBLP:journals/cl/ErdwegSVTBCGH0L15}. Most of these workbenches are now mature enough for being included in industrial settings, and allow language engineers to automate the development of the tools for the main scenarios of the expected language users. 
+
+Let us consider for example the language \textit{Logo}\footnote{cf. \url{https://en.wikipedia.org/wiki/Logo_(program}}. \textit{Logo} is an educational language whose main focus is the animation of turtle graphics. As such, most of the statements are accompanied by a feedback which is an action from the turtle, and this is part of what makes it interesting for teaching purposes. From a comprehensive definition of the language, it is possible to automatically generate a dedicated and structured editor that supports the definition of complete logo programs, including a functional architecture and an explicit execution flow across the architecture. 
+
+However, it has been recently recognized that the different tasks performed with a given language, possibly by different stakeholders, would require specific language support (\emph{e.g.,} dedicated environments with the right facilities) \cite{acher:hal-01061576}. For instance, while it can be convenient to have a comprehensive editor for editing complex logo programs, one would like access to other kinds of environment such as interactive environments that allow to immediately get the result of the program at the time it is being edited. Such an environment would be very useful for education purposes, such as learning about the language or evaluating existing libraries. Generally speaking, it becomes way easier to introduce a programming language to beginners if they don't have to conform to the structure of an entire program when they want to write their very first instructions~\cite{10.1007/BFb0033856}. \emph{Java} is a perfect example of this~\cite{Gray:2003:PGI:949344.949394,Allen:2002:DLP:563340.563395}, as this is a language that requires to follow a rather complex process to simply print `Hello World!' in a terminal emulator: the programmer needs to define a public class, declare a method both public and static and give it a specific name, while also specifying that it will require a certain type of arguments, before finally writing the very first statement of a program. Of course, the syntax makes perfectly sense, and understanding it will be important in order to learn how to use the language, but it can be detrimental to introduce it during the first glimpse at Java programming. An interactive computer programming environment can be beneficial to simply learn how specific language statements work in practice. In the case of \textit{Logo}, interactive computer programming environments would provide immediate feedback from any statement of the language, and help learning complex concepts. Note that interactive computer programming environments can be also beneficial for experienced language users, in order to test the behavior of code snippets at any time. It makes possible to run processes in an arbitrary order while having access to all the intermediary results, which can be very useful when experiencing a new API. Beyond learning the different facilities provided by the API, it may also help to learn specific protocols in the use of the API. 
+
+Interactive computer programming environment can take various forms, including a basic language shell where single statements can be executed sequentially, based on a global context, and possibly with the history of the intermediate states of the built program. Alternatively, a notebook interface provides a virtual notebook environment used for literate programming. It support the definition of a sequence of pieces of code, with intermediate results, and possibly word processing to document the program. 
+
+In all cases, an interactive computer programming environment requires a language interpreter in the form of a read–eval–print loop (REPL), which is able to execute a program piece by piece.  This requires to support different execution entry-points, and a specific management of the execution context and flow. The context is usually global (though some scoping rules can still apply), and the execution flow is sequential, starting from the starting point defined by the programmer. Other strategies may exist, in particular regarding the execution flow where a specific order may be imposed to keep reproducible executions. 
+
+REPL execution engines offer facilities such as: history of inputs and outputs, input editing and context specific completion over symbols, path names, class names and other objects, as well as help and documentation for commands.
+
+Nowadays, most general purpose languages take these considerations into account, and ship their own REPL implementation: \emph{Python} and \emph{C\#} run in interactive mode by default, \emph{Node.js} can execute the ``repl'' module out of the box, \emph{PHP} can be run as an interactive shell with the switch ``-a'', \emph{Swift} offers a REPL within Xcode, \emph{Ruby} is shipped with the executable ``IRb'', and even \emph{Java} includes its own REPL ``JShell'' since the version~9 of JDK.
+
+While interactive computer programming environments have been specifically developed for general purpose languages, there is currently no approach that helps to turn an existing DSL specification in a way that a complementary interactive environment can be automatically generated. Instead, a new specification must be established for the specific purpose of driving the development of an interactive environment. Hence, the research question (RQ) we address in this paper is the following: 
+	\begin{quote}
+	RQ: Is it possible to automate the transformation of an existing textual and interpreted DSL specification in such a way that an interactive computer programming environment can be automatically derived? 
+	\end{quote}
+	
+	We consider a DSL specification that includes:
+	\begin{itemize}
+		\item a syntax described as a grammar defined using a rule language based on "Extended Backus-Naur Form Expressions",
+		\item static semantics built from a set of first order logic rules, and
+		\item operational semantics based on a \textit{pure} interpreter pattern. \textit{Pure} means that each \textit{interpret} method of the interpreter accesses only the node object 	attributes and the context object attributes.
+	\end{itemize}
+
+Our approach provides the required abstractions for complementing an existing DSL specification with the minimal information needed for generating a REPL (\emph{i.e.}, the expected execution entry points and their associated documentation and output messages), and automates the transformation of the DSL specification so that an interactive computer programming environment can be derived. In particular, we automate the transformation of the syntax to parse separate pieces of code, and the semantics to support the execution of single statements according to a specific execution context and flow. We also propose a unified REPL interface in order to derive different kinds of environment, e.g., a language shell and a  notebook interface. 
+
+
+%%%......................
+
+\begin{comment}
+
+We want to provide language designers with a way to easily obtain a REPL for their languages.
+We do not, however, target languages that were made especially with interactivity in mind.
+Our intent is not to replace the work that a designer would put into his own interactive language, but to enable the ones working on more traditional DSLs to still obtain some interactivity with minimal effort.
+We see several advantages to having a REPL for languages that were not originally intended for this kind of execution:
+
+
+
+
+A REPL can circumvent this by, for example, making the print statement a valid entry-point.
+By having access to an interactive environment, it becomes easier to focus on particular matters and to teach in a more incremental way.
+
+In order to better illustrate the educational benefits of having an interactive environment available, we will use the language \textit{Logo}.
+
+
+ With interactivity, the feedback becomes instantaneous, and the learning can be more incremental by reusing the existing canvas when introducing new concepts.
+
+However, even an experienced language user can find an interest in using a REPL, since it gives the ability to test the behaviour of code snippets or whole methods at any time.
+It basically becomes possible to run processes in an arbitrary order while having access to all the intermediary results, which can be very useful when experimenting with an API for example:
+In some instance, an API might require to follow a rather complex protocol.
+Implementing the right sequence of actions in a working process can be a terrible ordeal if the programmer needs to edit and restart the whole program after each failure.
+As such, an interactive interpreter becomes the perfect tool to deal with these situations.
+
+Nowadays, most general purpose programming languages take these considerations into account, and ship their own REPL implementation:
+\begin{itemize}
+    \item \textit{Python} and \textit{C\#} run in interactive mode by default
+    \item \textit{Node.js} can execute the ``repl'' module out of the box
+    \item \textit{PHP} can be run as an interactive shell with the switch ``-a''
+    \item \textit{Swift} offers a REPL though Xcode
+    \item \textit{Ruby} is shipped with the executable ``IRb''
+    \item Even \textit{Java} includes its own REPL ``JShell'' since version~9
+\end{itemize}
+
+By offering an interactive interpreter, these languages could also be easily integrated in computational notebooks such as \textit{Jupyter}.
+As such, they can appeal to new users who have a need for the data analysis tool set provided by these environments.
+We would also like to see this kind of deployments for DSLs, and this work is a first step towards this goal.
+
+%\subsection{Problem Statement}
+
+There is no single definition around the notion of REPL, it can range from a rather precise description of the functionalities required as for the scheme programming language to a specific vision as in \url{repl.it}. In this paper, we define the notion of Repl as follows: 
+
+\begin{definition}
+
+\item A REPL is a language interpreter able to execute a program piece by piece, from several different execution entry-points. Its core functionalities are the following: 
+
+%For a language that accepts only models of a specific type as an entry-point, this means that a REPL should be able to execute independent parts of these models (that are of different types) while achieving the same results.
+
+%This is quite straightforward with imperative languages, whose execution is generally based on a visitor pattern:
+%\begin{itemize}
+%    \item Nodes are executed by their parents, using the provided scope and the results of their leaves
+%    \item Executed nodes spread the consequences of their side effects to the scope they received
+%\end{itemize}
+%By creating and managing a top level scope, a REPL has thus all it needs to execute sub-nodes of a complete model.
+
+%There is however less interest for functional languages, and overall for languages that don't allow for side effects.
+%Indeed, since executing instructions have no effect on the execution of future ones, having a single REPL or several interpreters for each part makes no difference.
+%Also, if having several entry-points for a language is not even wanted (which is the case for most functional languages, whose every elements are expressions and thus potential entry-points), it is fair to assume that a REPL as we defined it would be useless.
+
+%The usefulness of a REPL for dataflow languages is harder to define.
+%Being declarative, dataflow languages don't actually drive the execution and are more of description languages: the user doesn't expect the elements to have an effect on their own, only the whole model is meaningful (this is also a valid point for fully declarative functional languages).
+%But the individual semantic of the different elements is indeed used to drive the execution.
+%As such, a REPL for an actual dataflow language would try to connect descriptions of parts of a model with a semantic that doesn't make any sense if it is not executed by the whole model.
+%It is however easy to imagine two situations in which a REPL would be useful for a dataflow language:
+%\begin{itemize}
+%    \item In order to describe the dataflow, with a semantic whose only purpose is to create the structure
+%    \item In order to drive the execution, with a syntax that aims to actually have an effect on the execution
+%\end{itemize}
+%Taking all of this into account, we decided to focus our approach on imperative languages using the visitor pattern.
+
+
+
+
+\end{definition} 
+
+
+
+\begin{enumerate}
+\item History of inputs and outputs.
+\item Variables are set for the input expressions and results. These variables are also available in the REPL. 
+%\item Levels of REPLs. In many Lisp systems if an error occurs during the reading, evaluation or printing of an expression, the system is not thrown back to the top-level with an error message. Instead a new REPL, one level deeper, is started in the error context. The user can then inspect the problem, fix it and continue - if possible. If an error occurs in such a debug REPL, another REPL, again a level deeper, is started. Often the REPL offers special debug commands.
+
+%\item Error handling. The REPL provides restarts. These restarts can be used, when an error occurs, to go back to a certain REPL level.
+\item Input editing and context specific completion over symbols, path names, class names and other objects.
+\item Help and documentation for commands.
+\end{enumerate}
+
+
+The important challenge addressed in this paper can thus be reformulated as the following Research Question \textbf{RQ1}. 
+Is it possible to automatically extend a language specification including:
+\begin{enumerate}
+\item the syntax described as a grammar defined using a rule language based on "Extended Backus-Naur Form Expressions".
+\item Static semantics built from a set of first order logic rules 
+\item the operational semantics based on an \textit{pure} interpreter pattern. \textit{Pure} means that each \textit{interpret} method of the interpreter accesses only to the node object attribute and the context object attribute.  
+\end{enumerate}
+
+in order to automatically derive an interactive programming environment for this language?
+
+In particular, this work shows how to automatically transform the grammar specification and the operational semantics definition to support interactive programming environment, and the REPL feature defined above. Based on this work, try to answer the second following research question \textbf{RQ2}: What are the remaining scientific breakthrough for easing the creation of advanced interactive programming environment?
+
+\end{comment}

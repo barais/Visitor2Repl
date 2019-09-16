@@ -1,0 +1,194 @@
+%\documentclass[sigplan]{acmart}
+\documentclass[sigplan,screen]{acmart}
+\usepackage[utf8]{inputenc}
+\usepackage{alltt,xcolor}
+%\usepackage{flafter}
+\usepackage{listings}
+\usepackage{comment}
+\usepackage{todonotes}
+\usepackage{url}
+
+%%
+%% \BibTeX command to typeset BibTeX logo in the docs
+\AtBeginDocument{%
+  \providecommand\BibTeX{{%
+    \normalfont B\kern-0.5em{\scshape i\kern-0.25em b}\kern-0.8em\TeX}}}
+
+%% If you see 'ACMUNKNOWN' in the 'setcopyright' statement below,
+%%% please first submit your publishing-rights agreement with ACM (follow link on submission page).
+%%% Then please update our instructions page and copy-and-paste the NEW commands into your article.
+%%% Please contact us in case of questions; allow up to 10 min for the system to propagate the information.
+%%%
+%%% The following is specific to SLE '19 and the paper
+%%% 'From DSL Specification to Interactive Computer Programming Environment'
+%%% by Pierre Jeanjean, Benoit Combemale, and Olivier Barais.
+%%%
+\setcopyright{acmlicensed}
+\acmPrice{15.00}
+\acmDOI{10.1145/3357766.3359540}
+\acmYear{2019}
+\copyrightyear{2019}
+\acmISBN{978-1-4503-6981-7/19/10}
+\acmConference[SLE '19]{Proceedings of the 12th ACM SIGPLAN International Conference on Software Language Engineering}{October 20--22, 2019}{Athens, Greece}
+\acmBooktitle{Proceedings of the 12th ACM SIGPLAN International Conference on Software Language Engineering (SLE '19), October 20--22, 2019, Athens, Greece}
+
+\colorlet{punct}{red!60!black}
+\definecolor{background}{HTML}{EEEEEE}
+\definecolor{delim}{RGB}{20,105,176}
+\colorlet{numb}{magenta!60!black}
+
+\begin{document}
+
+\title{From DSL Specification to Interactive Computer Programming Environment}
+% Automatic synthesis of REPL from Language interpreter
+% Systematic REPL generation for visitor-based DSL
+% 
+
+
+\author{Pierre Jeanjean}
+\affiliation{%
+  \institution{Inria, Univ Rennes, CNRS, IRISA}
+  \city{Rennes}
+  \country{France}}
+\email{pierre.jeanjean@inria.fr}
+
+\author{Benoit Combemale}
+\affiliation{%
+  \institution{University of Toulouse}
+  \city{Toulouse}
+  \country{France}}
+\email{benoit.combemale@irit.fr}
+
+\author{Olivier Barais}
+\affiliation{%
+  \institution{Univ Rennes, Inria, CNRS, IRISA}
+  \city{Rennes}
+  \country{France}}
+\email{olivier.barais@irisa.fr}
+
+%%
+%% By default, the full list of authors will be used in the page
+%% headers. Often, this list is too long, and will overlap
+%% other information printed in the page headers. This command allows
+%% the author to define a more concise list
+%% of authors' names for this purpose.
+\renewcommand{\shortauthors}{Pierre Jeanjean, Benoit Combemale and Olivier Barais}
+
+\begin{abstract}
+% Context
+The adoption of Domain-Specific Languages (DSLs) relies on the capacity of language workbenches to automate the development of advanced and customized environments. 
+%
+%Problem
+While DSLs are usually well tailored for the main scenarios, the cost of developing mature tools prevents the ability to develop additional capabilities for alternative scenarios targeting specific tasks (e.g., API testing) or stakeholders (e.g., education). 
+%
+%Approach
+In this paper, we propose an approach to automatically generate interactive computer programming environments from existing specifications of textual interpreted DSLs. 
+%
+%More specifically, we consider an EMF-based language complemented with an operational semantics in the form of a visitor (or using the native EMF Switch), and automatically generate a REPL engine. 
+%
+%Scope of applicability: textual grammar-based language, explicit control flow, operational semantics in the form of a well-defined (top-down) interpreter or visitor, 
+%
+%The approach reifies the relevant abstractions to use when specifying the DSL, and use a combination of static analysis and language transformations to automate the translation of both the language syntax and semantics. The syntax is converted such as it is possible to load partial program limited to single statements, and the language interpreter is turn into an Read-Eval-Print Loop (REPL) engine. Hence, we provide the required generative approach to automate the integration into a ready-to-use interactive computer programming environments. 
+%
+%Results
+The approach provides abstractions to complement the DSL specification, and combines static analysis and language transformations to automate the transformation of the language syntax, the execution state and the execution semantics.
+%
+%Conclusion
+We evaluate the approach over a representative set of DSLs, and demonstrate the ability to automatically transform a textual syntax to load partial programs limited to a single statement, and to derive a Read-Eval-Print-Loop (REPL) from the specification of a language interpreter.
+%
+%While applicable to a broad range of textual and interpreted languages, our approach not only provide an REPL engine for free, but also transform the syntax such as it is possible to load partial model limited to single statements.
+
+\end{abstract}
+
+%%
+%% The code below is generated by the tool at http://dl.acm.org/ccs.cfm.
+%% Please copy and paste the code instead of the example below.
+%%
+\begin{CCSXML}
+<ccs2012>
+<concept>
+<concept_id>10011007.10011006.10011050.10011017</concept_id>
+<concept_desc>Software and its engineering~Domain specific languages</concept_desc>
+<concept_significance>500</concept_significance>
+</concept>
+</ccs2012>
+\end{CCSXML}
+
+\ccsdesc[500]{Software and its engineering~Domain specific languages}
+
+\lstdefinelanguage{json}{
+    basicstyle=\normalfont\ttfamily,
+    numbers=left,
+    numberstyle=\scriptsize,
+    stepnumber=1,
+    numbersep=8pt,
+    showstringspaces=false,
+    breaklines=true,
+    frame=lines,
+    backgroundcolor=\color{background},
+    literate=
+     *{0}{{{\color{numb}0}}}{1}
+      {1}{{{\color{numb}1}}}{1}
+      {2}{{{\color{numb}2}}}{1}
+      {3}{{{\color{numb}3}}}{1}
+      {4}{{{\color{numb}4}}}{1}
+      {5}{{{\color{numb}5}}}{1}
+      {6}{{{\color{numb}6}}}{1}
+      {7}{{{\color{numb}7}}}{1}
+      {8}{{{\color{numb}8}}}{1}
+      {9}{{{\color{numb}9}}}{1}
+      {:}{{{\color{punct}{:}}}}{1}
+      {,}{{{\color{punct}{,}}}}{1}
+      {\{}{{{\color{delim}{\{}}}}{1}
+      {\}}{{{\color{delim}{\}}}}}{1}
+      {[}{{{\color{delim}{[}}}}{1}
+      {]}{{{\color{delim}{]}}}}{1},
+}
+
+
+%%
+%% Keywords. The author(s) should pick words that accurately describe
+%% the work being presented. Separate the keywords with commas.
+\keywords{repl, language engineering, domain specific languages}
+
+%% A "teaser" image appears between the author and affiliation
+%% information and the body of the document, and typically spans the
+%% page.
+%\begin{teaserfigure}
+%  \includegraphics[width=\textwidth]{sampleteaser}
+%  \caption{Seattle Mariners at Spring Training, 2010.}
+%  \Description{Enjoying the baseball game from the third-base
+%  seats. Ichiro Suzuki preparing to bat.}
+%  \label{fig:teaser}
+%\end{teaserfigure}
+
+\maketitle
+
+\input{introduction}
+
+\input{motivations}
+
+\input{overview}
+
+
+%%
+%% Ways to use a notebook : normal, process, partial restart, change notification
+%%
+
+\input{implementation}
+
+%\input{environment}
+
+\input{results}
+
+\input{rw}
+
+\input{conclusion}
+
+%%
+%% The next two lines define the bibliography style to be used, and
+%% the bibliography file.
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{bibliography}
+
+\end{document}

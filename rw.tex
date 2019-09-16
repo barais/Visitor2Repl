@@ -1,0 +1,8 @@
+\section{Related works}
+\label{sec:rw}
+
+Various generic frameworks have been proposed in the last decade to integrate language REPLs, either for education purpose (\emph{e.g.,} Repl.it\footnote{cf. \url{https://repl.it}}) or scientific computing (\emph{e.g.,} Jupyther\footnote{cf. \url{https://jupyter.org}}). In all cases, a specific implementation of the language must be provided. While the implementation is time consuming, this is also error prone and needs to be aligned with the initial semantics of the language. 
+
+Bacat\'{a} has been recently proposed to automatically derive a new kernel for Jupyter from a DSL specification defined within the language workbench Rascal \cite{Merino:2018:BLP:3276604.3276981}. While all the implementation is automatically generated from the specification, the specification (i.e., the syntax and the semantics) has to be defined specifically for supporting a REPL. 
+
+Our approach automates the transformation from an initial specification for a textual interpreted DSL to a new specification and the underlying language implementation for being integrated into an interactive computer programming environnement. The resulting implementation can be integrated into either a simple language shell or more complex environments such as Notebooks. To the best of our knowledge, there is no related work addressing the specific challenge of automatically transforming a language syntax and semantics to support interactive programming (\emph{i.e.}, multiple execution entry-points, and management of the execution context and flow).

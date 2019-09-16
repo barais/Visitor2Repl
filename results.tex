@@ -1,0 +1,65 @@
+\section{Evaluation}
+\label{sec:evaluation}
+
+To address the four challenges identified in Section \ref{approach}, we propose an approach to automatically generate an interactive computer programming environment from a DSL specification and an identification of the execution entry points for this REPL. A first level of validation consists in applying our approach on other DSLs, namely \textit{MiniJava} and \textit{ThingML}, and to reflect on the lessons learnt. 
+   
+
+%In addition to Logo, we applied our approach on two other DSLs.
+
+\textit{MiniJava} is a subset of the general purpose language \textit{Java} that was created for teaching purposes, since \textit{Java} was considered too intimidating for students on various aspects \cite{Roberts:2001:OM:364447.364525}. The first implementation of \textit{MiniJava}, released in 2001, was also shipped with a REPL.  This DSL offer a good support to learn Java and test APIs as introduced in Section~\ref{motiv}.
+
+We started from an existing implementation in EMF/Xtext/ALE\footnote{Cf. \url{https://github.com/manuelleduc/ale-lang/tree/master/languages/minijava}}.
+This specific implementation is a large one, with 80 meta-classes and 200 attributes in the abstract syntax, 170 lines of Xtext for the grammar, and more than 1140 lines of ALE as operational semantics.
+In order to use real life APIs, we decided to add a support for native \textit{Java} calls through the Java JSR-223 API\footnote{Cf. \url{https://docs.oracle.com/javase/8/docs/technotes/guides/scripting/prog\_guide/api.html}}. 	JSR-223 is a standard API for calling scripting frameworks in Java. It is available since Java~6 and aims at providing a common framework for calling multiple languages from Java. 
+
+We selected nine execution entry-points: Type declarations, Method definitions, Statement blocks, Variable declarations, Assignments, For loops, While loops, Conditions, and Expressions. This means that we added nine \verb|@repl| annotations, including one with a specific output for the expressions. Considering the initial size of the DSL specification, these additions are only nine more lines in the semantics, which can be estimated as a modification of $0.6\%$ to generate a REPL for the existing DSL.
+
+%In the implementation that we used, the scoping was managed by a Xtext \textit{ScopeProvider} and the access rights were enforced by a Xtext \textit{Validator}. However, these two elements didn't follow a pure interpreter pattern implementation. The \textit{ScopeProvider} assumed that a statement would only exist within a \textit{Method}, a \textit{Block} or a \textit{For} loop condition, and the \textit{Validator} expected that every element would have a class in its hierarchy. As these were not respecting our initial hypothesis, we had to make them more defensive by adding \verb|null| checks before we could use them. When written defensively, scopes and visibilities work as intended for the generated REPL.
+
+We also added both a Xtext \textit{ScopeProvider}, to manage the scoping, and a Xtext \textit{Validator}, to enforce access rights, to the base definition of \textit{MiniJava}.
+Having these two new elements written with the pure interpreter pattern inside the DSL definition was not an issue, and they both work as intended for the generated REPL.
+
+The second DSL is an ALE implementation of \textit{ThingML}. ThingML\footnote{Cf. \url{https://github.com/TelluIoT/ThingML}} is a domain specific modeling language, that combines well-proven software modeling constructs for the design and implementation of distributed reactive systems:
+
+\begin{itemize}
+    \item statecharts and components (aligned with UML) communicating through asynchronous message passing,
+\item an imperative platform-independent action language,
+\item specific constructs targeting IoT applications.
+\end{itemize}
+
+The ThingML language is supported by a set of tools, which include editors, transformations (\emph{e.g.,} export to UML) and an advanced multi-platform code generation framework, which supports multiple target programming languages (C, Java, Javascript). Recently a simulator has been designed to emulate the distributed system behavior. The abstract syntax contains 88 meta-classes, for a total of 240 model elements. The grammar definition is more than 450 lines long, and writing the operational semantics in ALE require more than 1800 lines.
+
+Being a dataflow language, it was an interesting case study for us since our approach was mainly aimed at imperative DSLs.
+
+In a \textit{ThingML} program, a language user can define types and protocols, with some of those types being ``things'' that can declare functions and state machines, before instantiating them inside configurations. A configuration of connected things is a dataflow, and the operational semantics of \textit{ThingML} execute it for as long as they have steps to execute.
+
+The syntax of the DSL offers a way to describe complete dataflows, and our approach enables the definition of partial programs.
+However, the concept of partial dataflows is debatable. %\todo{à enrichir pourquoi est ce débattable au minimum mais une ref vers le débat}
+Since ThingML uses named elements in a configuration, we could use them as valid execution entry-points, but a smaller granularity would not make sense:
+\begin{itemize}
+    \item We could have instantiations and connections between things outside of configurations, but this would mean either that we execute a partial flow from the beginning after each change, or that \textit{ThingML} defines an \verb|execute| instruction (and it does not). Running several configurations is honestly just as good.
+    \item The statements used in functions could be available, but at best they could only be used to interact with completely executed configurations (and their instances if the concrete syntax provided a definition for qualified names), which would be of limited use.
+    \item With the two above, we could actually end up with a complete imperative  language, but it would be too far away from the original \textit{ThingML} to stay in the scope of what we want to provide.
+\end{itemize}
+
+As such, we decided to use the following 3 entry-points: Type definition, Protocol definition, and Configuration declaration (and execution). They correspond to 3 more lines in the semantics, which represent $0.12\%$ of the total DSL specification.
+Our \textit{ThingML} REPL makes it possible to split a program between elements definition and several configuration executions.
+However, there are a lot more interesting aspects to an interactive environment for a dataflow language: altering an already existing dataflow with new nodes and transitions, or controlling the execution step by step for example.
+
+\subsection*{Lessons learned}
+
+This experiment on two DSL specifications defined by other language engineers allowed us to verify several points, and to evaluate our initial RQ and associated four challenges. 
+
+The first lesson learned is the ability of our approach to be used on different DSLs as long as these specifications conformed to a certain number of expectations. The language engineer can specify the new entry points of the DSL, the associated outputs and the associated help messages in an expressive way. The effort to define these entry points remains low compared to the level of reuse of the abstract syntax, the grammar and the operational semantics. 
+Such an approach of automated transformation allows a language engineer to have significant confidence in the semantics preservation of the original DSL. Focusing all the tools associated with a DSL only on its specification is an important way to facilitate the evolution of all these artifacts, and in particular the associated REPL. 
+The assumptions made about the form of the implementation of static semantics, the operational semantics, and the different scoping rules are a bit strong. This means that two things are required at the moment: The definition of new entry points must be done by a language engineer and it is required to be able to access the DSL specification in case of issues to correct the parts that do not fully respect the assumption of a pure interpreter design pattern. Finally, if the approach perfectly fits the generation of interactive computer programming environments for imperative languages, many perspectives are opening up in the case of declarative or dataflow languages, and they lead to considering new opportunities for the interactive parts of these kinds of languages. 
+
+
+%1. Possible de générer un REPL de manière automatique. 
+
+%. Volume d'information à définir pour permettre la génération automatique assez faible et faible en ratio du volume d'élément réutilisé dans le 
+
+%3. Assomption un peu forte qui force ce travail de définition d'un REPL à être exécuté par un language designer expert. 
+
+%4. Nombreuses perspectives ouvertes sur la notion de dataflow. 
+

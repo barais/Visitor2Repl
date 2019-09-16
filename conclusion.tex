@@ -1,0 +1,13 @@
+\section{Conclusion and future work}
+\label{sec:conclusion}
+
+We describe in this paper an approach to automatically transform an existing specification of a textual and interpreted DSL, into a new specification that drives the development of an interactive computer programming environment. From additional information about the allowed entry points and the expected outputs when executed, we describe how to transform the grammar specification and the operational semantics specification so that we can have multiple execution entry points, and a sound and extensible management of the execution context and flow. We also define a unified interface to be used from different interactive environments such as a language shell and a notebook interface. The implementation and the evaluation have been done in the GEMOC Studio, but the proposed approach could be implemented in other language workbenches. 
+
+This approach opens up various perspectives. While our approach is currently expecting operational semantics in the form of an interpreter, we would like to extend it in the future to also cover translational semantics in the form of a compiler. We would also investigate the support of a seamless interoperability \cite{coulon:hal-01889155} between the interactive computer programming environments and the initial environment. In the long term, we would like to investigate polyglot interactive environments offering a seamless integration of heterogeneous languages.
+
+
+
+
+%This paper provides a first result around the work of providing the ability to automatically create an interactive computer programming environment from a language specification. It shows that from metadata defined by the language designer on i) the program entry points to be considered, ii) the outputs for these entry points, it is possible to construct a first level of REPL with the condition that the specification of the REPL respects some assumptions. 
+
+% How to tackle denotational semantic definitions? How to support relaxed grammar rules in which incomplete fragments of instructions are tolerated. How to allow the composition of the interactive computer programming environment by sharing the context between several interpreters? These open challenges would represent the next breakthroughs of our work on REPL generation.
